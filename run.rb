@@ -1,0 +1,12 @@
+#! /usr/bin/env ruby
+
+require "./soundweb"
+
+# Soundweb packet.
+packet = [0x02, 0x8D, 0x10, 0x01, 0x1B, 0x83, 0x00, 0x01, 0x37, 0x00, 0x00, 0x00, 0x00, 0xD7, 0x1D, 0x63, 0x03]
+  .pack("C*").force_encoding("ASCII-8BIT")
+
+stream = Kaitai::Struct::Stream.new(packet)
+data = Soundweb.new(stream)
+
+require "pry"; binding.pry
