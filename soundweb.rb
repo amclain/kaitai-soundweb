@@ -17,11 +17,14 @@ class Soundweb < Kaitai::Struct::Struct
 
   def _read
     @stx = @_io.ensure_fixed_contents([2].pack('C*'))
-    @message = @_io.read_bytes_term(3, false, false, true)
+    @_raw_message = @_io.read_bytes_term(3, false, false, true)
+    _process = UnescapeMessage.new()
+    @message = _process.decode(@_raw_message)
     @etx = @_io.ensure_fixed_contents([3].pack('C*'))
     self
   end
   attr_reader :stx
   attr_reader :message
   attr_reader :etx
+  attr_reader :_raw_message
 end

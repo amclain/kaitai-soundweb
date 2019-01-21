@@ -8,5 +8,6 @@ seq:
   - id: message
     terminator: 0x03
     consume: false
+    process: unescape_message
   - id: etx
     contents: [0x03]
