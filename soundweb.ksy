@@ -15,16 +15,27 @@ seq:
 types:
   message:
     seq:
+      - id: command
+        type: u1
+        enum: command
       - id: body
-        type: body
+        type:
+          switch-on: command
+          cases:
+            command::setsv: object_body
+            command::subscribesv: object_body
+            command::unsubscribesv: object_body
+            command::venue_preset_recall: preset_body
+            command::param_preset_recall: preset_body
+            command::setsvpercent: object_body
+            command::subscribesvpercent: object_body
+            command::unsubscribesvpercent: object_body
+            command::bumpsvpercent: object_body
       - id: checksum
         type: u1
         # TODO: checksum valid? ############################################
-  body:
+  object_body:
     seq:
-      - id: command
-        type: u1
-        enum: comamnd
       - id: node
         type: u2
       - id: virtual_device
@@ -36,9 +47,15 @@ types:
         type: u2
       - id: data
         type: u4
-        # TODO: CASE ###########################################
+    instances:
+      percentage:
+        value: data / 65536.0
+  preset_body:
+    seq:
+      - id: data
+        type: u4
 enums:
-  comamnd:
+  command:
     0x88: setsv
     0x89: subscribesv
     0x8A: unsubscribesv

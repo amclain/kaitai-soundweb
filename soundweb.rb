@@ -11,18 +11,18 @@ end
 # BSS Soundweb protocol
 class Soundweb < Kaitai::Struct::Struct
 
-  COMAMND = {
-    136 => :comamnd_setsv,
-    137 => :comamnd_subscribesv,
-    138 => :comamnd_unsubscribesv,
-    139 => :comamnd_venue_preset_recall,
-    140 => :comamnd_param_preset_recall,
-    141 => :comamnd_setsvpercent,
-    142 => :comamnd_subscribesvpercent,
-    143 => :comamnd_unsubscribesvpercent,
-    144 => :comamnd_bumpsvpercent,
+  COMMAND = {
+    136 => :command_setsv,
+    137 => :command_subscribesv,
+    138 => :command_unsubscribesv,
+    139 => :command_venue_preset_recall,
+    140 => :command_param_preset_recall,
+    141 => :command_setsvpercent,
+    142 => :command_subscribesvpercent,
+    143 => :command_unsubscribesvpercent,
+    144 => :command_bumpsvpercent,
   }
-  I__COMAMND = COMAMND.invert
+  I__COMMAND = COMMAND.invert
   def initialize(_io, _parent = nil, _root = self)
     super(_io, _parent, _root)
     _read
@@ -45,21 +45,41 @@ class Soundweb < Kaitai::Struct::Struct
     end
 
     def _read
-      @body = Body.new(@_io, self, @_root)
+      @command = Kaitai::Struct::Stream::resolve_enum(Soundweb::COMMAND, @_io.read_u1)
+      case command
+      when :command_unsubscribesvpercent
+        @body = ObjectBody.new(@_io, self, @_root)
+      when :command_subscribesvpercent
+        @body = ObjectBody.new(@_io, self, @_root)
+      when :command_bumpsvpercent
+        @body = ObjectBody.new(@_io, self, @_root)
+      when :command_setsv
+        @body = ObjectBody.new(@_io, self, @_root)
+      when :command_venue_preset_recall
+        @body = PresetBody.new(@_io, self, @_root)
+      when :command_param_preset_recall
+        @body = PresetBody.new(@_io, self, @_root)
+      when :command_unsubscribesv
+        @body = ObjectBody.new(@_io, self, @_root)
+      when :command_subscribesv
+        @body = ObjectBody.new(@_io, self, @_root)
+      when :command_setsvpercent
+        @body = ObjectBody.new(@_io, self, @_root)
+      end
       @checksum = @_io.read_u1
       self
     end
+    attr_reader :command
     attr_reader :body
     attr_reader :checksum
   end
-  class Body < Kaitai::Struct::Struct
+  class ObjectBody < Kaitai::Struct::Struct
     def initialize(_io, _parent = nil, _root = self)
       super(_io, _parent, _root)
       _read
     end
 
     def _read
-      @command = Kaitai::Struct::Stream::resolve_enum(Soundweb::COMAMND, @_io.read_u1)
       @node = @_io.read_u2be
       @virtual_device = @_io.read_u1
       @object = @_io.read_bytes(3)
@@ -67,11 +87,27 @@ class Soundweb < Kaitai::Struct::Struct
       @data = @_io.read_u4be
       self
     end
-    attr_reader :command
+    def percentage
+      return @percentage unless @percentage.nil?
+      @percentage = (data / 65536.0)
+      @percentage
+    end
     attr_reader :node
     attr_reader :virtual_device
     attr_reader :object
     attr_reader :state_variable
+    attr_reader :data
+  end
+  class PresetBody < Kaitai::Struct::Struct
+    def initialize(_io, _parent = nil, _root = self)
+      super(_io, _parent, _root)
+      _read
+    end
+
+    def _read
+      @data = @_io.read_u4be
+      self
+    end
     attr_reader :data
   end
   attr_reader :stx
