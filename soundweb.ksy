@@ -41,8 +41,7 @@ types:
       - id: virtual_device
         type: u1
       - id: object
-        # type: u4
-        size: 3
+        type: b24
       - id: state_variable
         type: u2
       - id: data

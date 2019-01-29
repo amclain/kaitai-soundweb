@@ -82,7 +82,8 @@ class Soundweb < Kaitai::Struct::Struct
     def _read
       @node = @_io.read_u2be
       @virtual_device = @_io.read_u1
-      @object = @_io.read_bytes(3)
+      @object = @_io.read_bits_int(24)
+      @_io.align_to_byte
       @state_variable = @_io.read_u2be
       @data = @_io.read_u4be
       self
